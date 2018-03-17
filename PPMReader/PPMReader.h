@@ -52,6 +52,7 @@ class PPMReader : InterruptHandler {
     // Arrays for keeping track of channel values
     volatile unsigned long *rawValues = NULL;
     volatile unsigned long *validValues = NULL;
+    volatile byte *channelStatus = NULL;
 
     // A counter variable for determining which channel is being read next
     volatile byte pulseCounter = 0;
@@ -72,6 +73,11 @@ class PPMReader : InterruptHandler {
     /* Returns the latest received value that was considered valid for the channel (starting from 1).
      * Returns defaultValue if the given channel hasn't received any valid values yet. */
     unsigned long latestValidChannelValue(byte channel, unsigned long defaultValue);
+
+    /* Returns whether the channel has received any valid data since the last call
+     * to latestValidChannelValue().
+     */
+    byte channelState(const byte channel) const;
 
     private:
 
