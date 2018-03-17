@@ -43,7 +43,7 @@ PPMReader::~PPMReader() {
     delete [] validValues;
 }
 
-void PPMReader::handleInterrupt(int8_t interruptNum) {
+void PPMReader::handleInterrupt(int8_t) {
     // Remember the current micros() and calculate the time since the last pulseReceived()
     unsigned long previousMicros = microsAtLastPulse;
     microsAtLastPulse = micros();
