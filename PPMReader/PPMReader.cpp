@@ -26,9 +26,11 @@ PPMReader::PPMReader(byte interruptPin, byte channelAmount) {
         this->channelAmount = channelAmount;
         rawValues = new unsigned long[channelAmount];
         validValues = new unsigned long[channelAmount];
+        channelStatus = new byte[channelAmount];
         for (int i = 0; i < channelAmount; ++i) {
             rawValues[i] = 0;
             validValues[i] = 0;
+            channelStatus[i] = 1;
         }
         // Attach an interrupt to the pin
         this->interruptPin = interruptPin;
@@ -60,6 +62,7 @@ void PPMReader::handleInterrupt(int8_t) {
             rawValues[pulseCounter] = time;
             if (time >= minChannelValue - channelValueMaxError && time <= maxChannelValue + channelValueMaxError) {
                 validValues[pulseCounter] = constrain(time, minChannelValue, maxChannelValue);
+                channelStatus[pulseCounter] = 0;
             }
         }
         ++pulseCounter;
@@ -77,10 +80,18 @@ unsigned long PPMReader::rawChannelValue(byte channel) {
     return value;
 }
 
+byte PPMReader::channelState(const byte channel) const {
+    if (channel >= 1 && channel <= channelAmount) {
+        return channelStatus[channel-1];
+    }
+    return 1;
+}
+
 unsigned long PPMReader::latestValidChannelValue(byte channel, unsigned long defaultValue) {
     // Check for channel's validity and return the latest valid channel value or defaultValue.
     unsigned long value = defaultValue;
     if (channel >= 1 && channel <= channelAmount) {
+        channelStatus[channel-1] = 1;
         noInterrupts();
         value = validValues[channel-1];
         interrupts();
